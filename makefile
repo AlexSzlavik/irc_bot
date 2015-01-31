@@ -1,13 +1,16 @@
 CXX			= dmd
 CXXFLAGS	= -w -g -debug -c
 
-all: irc_bot
+BINARY		= irc_bot
+OBJECTS 	= irc_bot.o message.o
 
-irc_bot: irc_bot.o message.o
+all: $(BINARY)
+
+clean:
+	-rm $(OBJECTS) $(BINARY)
+
+$(BINARY): $(OBJECTS)
 	$(CXX) $^ -of$@
 
-irc_bot.o: irc_bot.d 
-	$(CXX) $(CXXFLAGS) $?
-
-message.o: message.d
+%.o: %.d
 	$(CXX) $(CXXFLAGS) $?
