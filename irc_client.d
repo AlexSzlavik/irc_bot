@@ -75,6 +75,12 @@ class IRC_Client
 		}
 
 		void
+		Register_event_handler( IRC_Message.Type type, Event_handler handler )
+		{
+			IRC_Event_listeners[ type ] ~= handler;
+		}
+
+		void
 		Process_requests()
 		{
 			while(true)
@@ -102,9 +108,17 @@ class IRC_Client
 							writeln( s );
 							//assert( false );
 					}
+					
+					foreach( Event_handler e; IRC_Event_listeners[msg.Message_type] )
+						e.callback( msg );
 				}
 				Get_data();
 			}
+		}
+		
+		struct Event_handler
+		{
+			void function( IRC_Message msg ) callback;
 		}
 
 	private:
@@ -112,13 +126,5 @@ class IRC_Client
 		string			IRC_Channel;
 		string			IRC_User_name;
 		Message_buffer	IRC_Buffer = new Message_buffer();
-}
-
-void
-main( string args[] )
-{
-	IRC_Client client = new IRC_Client( "irc.freenode.org", 6667, "bclab_bot" );
-	client.Join_channel( "#baconator", "bacon" );
-
-	client.Process_requests();
+		Event_handler	IRC_Event_listeners[ IRC_Message.Type ][];
 }
