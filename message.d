@@ -101,6 +101,20 @@ class IRC_Message
 			Message_sender = sender;
 		}
 
+		string [string]
+		Decouple_origin( string sender )
+		{
+			string ret[string];
+			//:nickname[!username[@hostname]]
+			auto name = matchFirst( sender, ":([^!@ ]+)(!([^!@ ]+)(@([^!@ ]+)){0,1}){0,1}" );
+
+			ret["nickname"] = name[1];
+			ret["username"] = name[3];
+			ret["hostname"] = name[5];
+
+			return ret;
+		}
+
 		void
 		Append_original( string msg )
 		{
@@ -154,15 +168,14 @@ class IRC_PRIVMSG : IRC_Message
 		{
 			super( sender, IRC_Message.Type.PRIVMSG, params );
 
-			auto name = matchFirst( sender, ":([^!@ ]*)" );
 			auto param_break = matchFirst( params, "([^ ]+) :(.*)" );
+			Sender = Decouple_origin( sender );
 
-			Sender_nickname = name[1];
 			Message_text = param_break[2];
 			Message_destination = param_break[1];
 		}
 
-		string Sender_nickname;
+		string [string] Sender;
 		string Message_text;
 		string Message_destination;
 }

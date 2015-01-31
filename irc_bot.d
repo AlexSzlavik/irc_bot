@@ -89,14 +89,17 @@ class IRC_Client
 					{
 						case IRC_Message.Type.PRIVMSG:
 							IRC_PRIVMSG priv_msg = cast(IRC_PRIVMSG)msg;
-							writeln( priv_msg.Sender_nickname~": "~priv_msg.Message_text);
+							writeln( priv_msg.Sender["nickname"]~": "~priv_msg.Message_text);
 							break;
+
 						case IRC_Message.Type.PING:
 							IRC_PING ping_msg = cast(IRC_PING)msg;
 							IRC_Socket.send( "PONG "~ping_msg.Ping_sender~"\r\n" );
 							writeln( msg );
 							break;
+
 						default:
+							writeln( s );
 							//assert( false );
 					}
 				}
