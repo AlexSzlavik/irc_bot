@@ -118,7 +118,6 @@ class IRC_Client
 
 						default:
 							writeln( s );
-							//assert( false );
 					}
 					
 					if( msg.Message_type in IRC_Event_listeners )

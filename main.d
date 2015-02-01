@@ -95,11 +95,19 @@ main( string args[] )
 	Configure( args, opt );
 
 	IRC_Client client = new IRC_Client( opt.IRC_Hostname, opt.IRC_Port, opt.IRC_Botname );
-	client.Join_channel( opt.IRC_Channel, opt.IRC_Channel_password );
 
 	// Add modules
-	Register_modules( client );
+	try
+	{
+		Register_modules( client );
+	}
+	catch ( Exception e )
+	{
+		stderr.writeln( "Error initializing modules" );
+		exit(1);
+	}
 
 	// Main loop, never exits
+	client.Join_channel( opt.IRC_Channel, opt.IRC_Channel_password );
 	client.Process_requests();
 }
