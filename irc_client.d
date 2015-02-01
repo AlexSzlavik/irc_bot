@@ -4,6 +4,7 @@ import std.regex;
 import std.container;
 import std.conv;
 import std.array;
+import std.exception;
 
 public import message;
 
@@ -32,6 +33,8 @@ class IRC_Client
 		void
 		Join_channel( string channel, string pass = "" )
 		{
+			enforce( channel != "", "No channel name given" );
+
 			bool joined = false;
 			IRC_Channel = channel;
 			IRC_Socket.send( "NICK "~IRC_User_name~"\r\n" );
