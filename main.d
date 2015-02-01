@@ -12,6 +12,7 @@ import irc_client;
 
 // Modules
 import ping_counter;
+import profanity_listener;
 
 struct Options
 {
@@ -78,6 +79,16 @@ Configure( string args [], Options* options )
 }
 
 void
+Register_modules( ref IRC_Client client )
+{
+	Ping_handler pinger = new Ping_handler();
+	Profanity_listener pl = new Profanity_listener();
+
+	client.Register_event_handler( pinger );
+	client.Register_event_handler( pl );
+}
+
+void
 main( string args[] )
 {
 	Options *opt = new Options();
@@ -87,9 +98,7 @@ main( string args[] )
 	client.Join_channel( opt.IRC_Channel, opt.IRC_Channel_password );
 
 	// Add modules
-	Ping_handler pinger = new Ping_handler();
-
-	client.Register_event_handler( pinger );
+	Register_modules( client );
 
 	// Main loop, never exits
 	client.Process_requests();
