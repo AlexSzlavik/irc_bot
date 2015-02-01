@@ -2,7 +2,7 @@ CXX			= dmd
 CXXFLAGS	= -w -g -debug -c
 
 BINARY		= irc_bot
-OBJECTS 	= irc_client.o message.o main.o 
+OBJECTS 	= irc_client.o message.o main.o ping_counter.o
 
 all: $(BINARY)
 

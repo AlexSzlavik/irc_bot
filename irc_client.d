@@ -5,7 +5,14 @@ import std.container;
 import std.conv;
 import std.array;
 
-import message;
+public import message;
+
+interface IRC_Module
+{
+	public:
+		void Handle_event( IRC_Message msg, IRC_Client c );
+		@property IRC_Message.Type[] Handled_types();
+}
 
 class IRC_Client
 {
@@ -51,8 +58,9 @@ class IRC_Client
 		}
 
 		void
-		Send_message( string message, string receipient = IRC_Channel )
+		Send_message( string message, string receipient = "" )
 		{
+			if( receipient == "" ) receipient = IRC_Channel;
 			string data = "PRIVMSG "~receipient~" :"~message~"\r\n";
 			IRC_Socket.send( data );
 		}
@@ -75,9 +83,10 @@ class IRC_Client
 		}
 
 		void
-		Register_event_handler( IRC_Message.Type type, Event_handler handler )
+		Register_event_handler( IRC_Module mod )
 		{
-			IRC_Event_listeners[ type ] ~= handler;
+			foreach( IRC_Message.Type t; mod.Handled_types )
+				IRC_Event_listeners[ t ] ~= &mod.Handle_event;
 		}
 
 		void
@@ -109,22 +118,20 @@ class IRC_Client
 							//assert( false );
 					}
 					
-					foreach( Event_handler e; IRC_Event_listeners[msg.Message_type] )
-						e.callback( msg );
+					if( msg.Message_type in IRC_Event_listeners )
+						foreach( CC e; IRC_Event_listeners[msg.Message_type] )
+							e( msg, this );
 				}
 				Get_data();
 			}
 		}
 		
-		struct Event_handler
-		{
-			void function( IRC_Message msg ) callback;
-		}
+		alias CC = void delegate( IRC_Message msg, IRC_Client c );
 
 	private:
 		TcpSocket 		IRC_Socket;
 		string			IRC_Channel;
 		string			IRC_User_name;
 		Message_buffer	IRC_Buffer = new Message_buffer();
-		Event_handler	IRC_Event_listeners[ IRC_Message.Type ][];
+		CC				IRC_Event_listeners[ IRC_Message.Type ][];
 }
