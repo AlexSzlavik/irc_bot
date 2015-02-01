@@ -1,0 +1,12 @@
+CONFIG FORMAT
+
+The configuration takes one config options per line, seperated by newline characters.
+Options are to be written in the form:
+<option name>=<option value>
+
+Valid options are:
+ hostname=[string]
+ port=[ushort]
+ botname=[string]
+ channel=[string]
+ channel_password=[string]
