@@ -25,7 +25,14 @@ class Profanity_listener : IRC_Module
 			IRC_PRIVMSG priv = cast(IRC_PRIVMSG)msg;
 			enforce( msg.Message_type == IRC_Message.Type.PRIVMSG, "Profanity listener: Invalid message type" );
 
+			if( priv.Message_destination == c.Nickname )
+			{
+				Handle_pm( priv, c );
+				return;
+			}
+
 			// Super aweful O(n*m) algorithm, n dictornary, m word count in string
+			// Might be better of constructing a regex here
 			foreach( string word; split( priv.Message_text, " " ) )
 			{
 				foreach( string dic_word; dictonary )
@@ -36,6 +43,55 @@ class Profanity_listener : IRC_Module
 						c.Send_message( priv.Sender["nickname"] ~ ": Bad Boy!", priv.Sender["nickname"] );
 					}
 				}
+			}
+		}
+
+		void
+		Add_words( string words[], IRC_Client c, string sender )
+		{
+			if( words.length == 0 ) Usage ( c, sender );
+			dictonary ~= words;
+
+			string response = "PROF: Added ( ";
+			foreach( string word; words )
+				response ~= word ~" ";
+			response ~= ") to the naughty list";
+
+			c.Send_message( response, sender );
+		}
+
+		void
+		Usage( IRC_Client c, string sender )
+		{
+			c.Send_message( "Usage: PROF", sender ); 
+		}
+
+		void
+		Handle_pm( IRC_PRIVMSG msg, IRC_Client c )
+		{
+			string params[] = split( msg.Message_text, " " );
+			string sender = msg.Sender["nickname"];
+
+			writeln( params );
+
+			// Check if the msssage is for us
+			if( params[0] != "PROF" )
+				return;
+			if( params.length < 2 )
+			{
+				Usage( c, sender );
+				return;
+			}
+
+			switch( params[1] )
+			{
+				case "add": 	// add a word to the list
+					Add_words( params[2..$], c, sender );
+					break;
+
+				case "help":
+				default:
+					Usage( c, sender );
 			}
 		}
 

@@ -30,6 +30,17 @@ class IRC_Client
 			this( IRC_Socket, name );
 		}
 
+		@property string Nickname()
+		{
+			return IRC_User_name;
+		}
+
+		@property string Channel()
+		{
+			return IRC_Channel;
+		}
+		
+
 		void
 		Join_channel( string channel, string pass = "" )
 		{
@@ -108,6 +119,8 @@ class IRC_Client
 						case IRC_Message.Type.PRIVMSG:
 							IRC_PRIVMSG priv_msg = cast(IRC_PRIVMSG)msg;
 							writeln( priv_msg.Sender["nickname"]~": "~priv_msg.Message_text);
+							if( matchFirst(priv_msg.Message_text, IRC_User_name))
+								Send_message( "I live here: https://github.com/AlexSzlavik?tab=repositories" );
 							break;
 
 						case IRC_Message.Type.PING:
@@ -127,7 +140,7 @@ class IRC_Client
 				Get_data();
 			}
 		}
-		
+
 		alias CC = void delegate( IRC_Message msg, IRC_Client c );
 
 	private:

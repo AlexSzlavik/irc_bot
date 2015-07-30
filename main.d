@@ -84,7 +84,7 @@ Register_modules( ref IRC_Client client )
 	Ping_handler pinger = new Ping_handler();
 	Profanity_listener pl = new Profanity_listener();
 
-	client.Register_event_handler( pinger );
+	//client.Register_event_handler( pinger );
 	client.Register_event_handler( pl );
 }
 
