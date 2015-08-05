@@ -13,6 +13,8 @@ import irc_client;
 // Modules
 import ping_counter;
 import profanity_listener;
+import greeter;
+import magic8;
 
 struct Options
 {
@@ -83,9 +85,13 @@ Register_modules( ref IRC_Client client )
 {
 	Ping_handler pinger = new Ping_handler();
 	Profanity_listener pl = new Profanity_listener();
+	Greeter greeter = new Greeter();
+	Magic8 magic = new Magic8();
 
 	//client.Register_event_handler( pinger );
 	client.Register_event_handler( pl );
+	client.Register_event_handler( greeter );
+	client.Register_event_handler( magic );
 }
 
 void

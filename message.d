@@ -56,7 +56,8 @@ class IRC_Message
 			INVALID,
 			JOIN,
 			PING,
-			PRIVMSG
+			PRIVMSG,
+			QUIT
 		}
 
 		Type Message_type;
@@ -149,11 +150,13 @@ class IRC_Message
 			switch( message )
 			{
 				case "JOIN":
-					return new IRC_Message( IRC_Message.Type.JOIN );
+					return new IRC_Message( IRC_Message.Type.JOIN, paramaters );
 				case "PRIVMSG":
 					return new IRC_PRIVMSG( prefix, paramaters );
 				case "PING":
 					return new IRC_PING( paramaters );
+				case "QUIT":
+					return new IRC_QUIT( prefix );
 				default:
 					return new IRC_Message();
 			}
@@ -193,3 +196,15 @@ class IRC_PING : IRC_Message
 		string Ping_sender;
 }
 
+class IRC_QUIT : IRC_Message
+{
+	public:
+		this( string sender )
+		{
+			super( sender, IRC_Message.Type.QUIT );
+			string dec[string] = Decouple_origin( sender );
+			Sender = dec["nickname"];
+		}
+
+		string Sender;
+}

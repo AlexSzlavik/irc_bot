@@ -50,19 +50,29 @@ class IRC_Client
 			IRC_Channel = channel;
 			IRC_Socket.send( "NICK "~IRC_User_name~"\r\n" );
 			IRC_Socket.send( "USER "~IRC_User_name~" 8 * :Bot\r\n" );
-			IRC_Socket.send( "JOIN "~IRC_Channel~" "~pass~"\r\n" );
 
 			// Wait for JOIN ack from the server
 			while( !joined )
 			{
 				string s;
+				IRC_Socket.send( "JOIN "~IRC_Channel~" "~pass~"\r\n" );
 				while( (s = Get_next_message()) != ""  )
 				{
 					writeln( s );
 					IRC_Message msg = IRC_Message.Parse_message( s );
 					if( msg.Message_type == IRC_Message.Type.JOIN )
 					{
-						joined = true;
+						if( msg.Message_paramaters[1 .. msg.Message_paramaters.length] == IRC_Channel )
+						{
+							writeln("Found");
+							joined = true;
+							break;
+						}
+					}
+					if( msg.Message_type == IRC_Message.Type.PING )
+					{
+						IRC_PING ping_msg = cast(IRC_PING)msg;
+						IRC_Socket.send( "PONG "~ping_msg.Ping_sender~"\r\n" );
 						break;
 					}
 				}
@@ -116,13 +126,6 @@ class IRC_Client
 					
 					switch( msg.Message_type )
 					{
-						case IRC_Message.Type.PRIVMSG:
-							IRC_PRIVMSG priv_msg = cast(IRC_PRIVMSG)msg;
-							writeln( priv_msg.Sender["nickname"]~": "~priv_msg.Message_text);
-							if( matchFirst(priv_msg.Message_text, IRC_User_name))
-								Send_message( "I live here: https://github.com/AlexSzlavik?tab=repositories" );
-							break;
-
 						case IRC_Message.Type.PING:
 							IRC_PING ping_msg = cast(IRC_PING)msg;
 							IRC_Socket.send( "PONG "~ping_msg.Ping_sender~"\r\n" );
