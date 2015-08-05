@@ -1,3 +1,4 @@
 *.o
 irc_bot
 config.cfg
+tags
