@@ -16,7 +16,7 @@ class Ping_handler : IRC_Module
 
 		@property IRC_Message.Type[] Handled_types()
 		{
-			IRC_Message.Type handled[];
+			IRC_Message.Type[] handled;
 			handled ~= IRC_Message.Type.PING;
 			return handled;
 		}

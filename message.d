@@ -44,8 +44,8 @@ class Message_buffer
 		}
 
 	private:
-		string string_buffer;
-		string messages[];
+		string 		string_buffer;
+		string[] 	messages;
 }
 
 class IRC_Message
@@ -105,7 +105,7 @@ class IRC_Message
 		string [string]
 		Decouple_origin( string sender )
 		{
-			string ret[string];
+			string[string] ret;
 			//:nickname[!username[@hostname]]
 			auto name = matchFirst( sender, ":([^!@ ]+)(!([^!@ ]+)(@([^!@ ]+)){0,1}){0,1}" );
 
@@ -202,7 +202,7 @@ class IRC_QUIT : IRC_Message
 		this( string sender )
 		{
 			super( sender, IRC_Message.Type.QUIT );
-			string dec[string] = Decouple_origin( sender );
+			string[string] dec = Decouple_origin( sender );
 			Sender = dec["nickname"];
 		}
 

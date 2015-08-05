@@ -15,7 +15,7 @@ class Greeter : IRC_Module
 
 		@property IRC_Message.Type[] Handled_types()
 		{
-			IRC_Message.Type handled[];
+			IRC_Message.Type[] handled;
 			handled ~= IRC_Message.Type.QUIT;
 			return handled;
 		}

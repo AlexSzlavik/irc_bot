@@ -33,10 +33,10 @@ Usage( string name )
 }
 
 void
-Configure( string args [], Options* options )
+Configure( string[] args, Options* options )
 {
 	string config_file = "config.cfg";
-	string lines[];
+	string[] lines;
 
 	getopt( args,
 			"c", &config_file );
@@ -57,7 +57,7 @@ Configure( string args [], Options* options )
 	foreach( string s; lines )
 	{
 		auto reg = ctRegex!("=");
-		string values[] = split( s, reg );
+		string[] values = split( s, reg );
 		switch( values[0] )
 		{
 			case "hostname":
@@ -95,7 +95,7 @@ Register_modules( ref IRC_Client client )
 }
 
 void
-main( string args[] )
+main( string[] args )
 {
 	Options *opt = new Options();
 	Configure( args, opt );

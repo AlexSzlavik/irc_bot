@@ -92,7 +92,7 @@ class IRC_Client
 		void
 		Get_data()
 		{
-			char data[512];
+			char[512] data;
 			auto amount = IRC_Socket.receive( data );
 			
 			string r = to!string(data[0..amount]);
@@ -147,9 +147,9 @@ class IRC_Client
 		alias CC = void delegate( IRC_Message msg, IRC_Client c );
 
 	private:
-		TcpSocket 		IRC_Socket;
-		string			IRC_Channel;
-		string			IRC_User_name;
-		Message_buffer	IRC_Buffer = new Message_buffer();
-		CC				IRC_Event_listeners[ IRC_Message.Type ][];
+		TcpSocket 					IRC_Socket;
+		string						IRC_Channel;
+		string						IRC_User_name;
+		Message_buffer				IRC_Buffer = new Message_buffer();
+		CC[][ IRC_Message.Type ]	IRC_Event_listeners;
 }

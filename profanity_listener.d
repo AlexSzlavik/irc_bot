@@ -47,7 +47,7 @@ class Profanity_listener : IRC_Module
 		}
 
 		void
-		Add_words( string words[], IRC_Client c, string sender )
+		Add_words( string[] words, IRC_Client c, string sender )
 		{
 			if( words.length == 0 ) Usage ( c, sender );
 			dictonary ~= words;
@@ -69,7 +69,7 @@ class Profanity_listener : IRC_Module
 		void
 		Handle_pm( IRC_PRIVMSG msg, IRC_Client c )
 		{
-			string params[] = split( msg.Message_text, " " );
+			string[] params = split( msg.Message_text, " " );
 			string sender = msg.Sender["nickname"];
 
 			writeln( params );
@@ -103,6 +103,6 @@ class Profanity_listener : IRC_Module
 		}
 
 	private:
-		string config_file = "profanity.cfg";
-		string dictonary[];
+		string 		config_file = "profanity.cfg";
+		string[] 	dictonary;
 }
