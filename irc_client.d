@@ -5,6 +5,7 @@ import std.container;
 import std.conv;
 import std.array;
 import std.exception;
+import std.string;
 
 public import message;
 
@@ -62,7 +63,7 @@ class IRC_Client
 					IRC_Message msg = IRC_Message.Parse_message( s );
 					if( msg.Message_type == IRC_Message.Type.JOIN )
 					{
-						if( msg.Message_paramaters[1 .. msg.Message_paramaters.length] == IRC_Channel )
+						if( msg.Message_paramaters.indexOf( IRC_Channel ) != -1 )
 						{
 							writeln("Found");
 							joined = true;

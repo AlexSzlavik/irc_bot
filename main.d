@@ -9,6 +9,7 @@ import core.stdc.stdlib;
 
 import message;
 import irc_client;
+public import database;
 
 // Modules
 import ping_counter;
@@ -23,6 +24,7 @@ struct Options
 	string 	IRC_Botname				= "bclab_bot";
 	string	IRC_Channel;
 	string	IRC_Channel_password;
+	string	IRC_Database_file		= "bot.db";
 }
 
 void
@@ -100,6 +102,7 @@ main( string[] args )
 	Options *opt = new Options();
 	Configure( args, opt );
 
+	Open_database( opt.IRC_Database_file );
 	IRC_Client client = new IRC_Client( opt.IRC_Hostname, opt.IRC_Port, opt.IRC_Botname );
 
 	// Add modules

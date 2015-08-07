@@ -57,6 +57,7 @@ class IRC_Message
 			JOIN,
 			PING,
 			PRIVMSG,
+			PART,
 			QUIT
 		}
 
@@ -100,6 +101,20 @@ class IRC_Message
 			Message_type = type;
 			Message_paramaters = params;
 			Message_sender = sender;
+		}
+
+		string [string]
+		Decouple_origin()
+		{
+			string[string] ret;
+			//:nickname[!username[@hostname]]
+			auto name = matchFirst( Message_sender, ":([^!@ ]+)(!([^!@ ]+)(@([^!@ ]+)){0,1}){0,1}" );
+
+			ret["nickname"] = name[1];
+			ret["username"] = name[3];
+			ret["hostname"] = name[5];
+
+			return ret;
 		}
 
 		string [string]
@@ -150,11 +165,13 @@ class IRC_Message
 			switch( message )
 			{
 				case "JOIN":
-					return new IRC_Message( IRC_Message.Type.JOIN, paramaters );
+					return new IRC_JOIN( prefix, paramaters );
 				case "PRIVMSG":
 					return new IRC_PRIVMSG( prefix, paramaters );
 				case "PING":
 					return new IRC_PING( paramaters );
+				case "PART":
+					return new IRC_PART( prefix );
 				case "QUIT":
 					return new IRC_QUIT( prefix );
 				default:
@@ -196,6 +213,19 @@ class IRC_PING : IRC_Message
 		string Ping_sender;
 }
 
+class IRC_PART : IRC_Message
+{
+	public:
+		this( string sender )
+		{
+			super( sender, IRC_Message.Type.PART );
+			string[string] dec = Decouple_origin( sender );
+			Sender = dec["nickname"];
+		}
+
+		string Sender;
+}
+
 class IRC_QUIT : IRC_Message
 {
 	public:
@@ -204,6 +234,18 @@ class IRC_QUIT : IRC_Message
 			super( sender, IRC_Message.Type.QUIT );
 			string[string] dec = Decouple_origin( sender );
 			Sender = dec["nickname"];
+		}
+
+		string Sender;
+}
+
+class IRC_JOIN : IRC_Message
+{
+	public:
+		this( string joiner, string channel )
+		{
+			super( joiner, IRC_Message.Type.JOIN, channel );
+			Sender = Decouple_origin()["nickname"];
 		}
 
 		string Sender;

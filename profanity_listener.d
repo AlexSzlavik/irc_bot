@@ -1,5 +1,6 @@
 import irc_client;
 import std.exception, std.stdio, std.regex, std.file, std.conv, std.string;
+import database;
 
 class Profanity_listener : IRC_Module
 {
@@ -10,10 +11,32 @@ class Profanity_listener : IRC_Module
 
 			try
 			{
-				char[] data = to!(char[])(read( config_file ) );
-				dictonary = split!string(to!string(data));
+
+				//Seed the databse with the config words
+				if( db.execute( "select * from Profanity_words" ).empty() )
+				{
+					char[] data = to!(char[])(read( config_file ) );
+					dictonary = split!string(to!string(data));
+
+					string update = "insert into Profanity_words(word) values ";
+					foreach( string e; dictonary )
+						update ~= "('" ~ e ~ "'),";
+					update = chomp( update, "," );
+					db.execute( update );
+				}
+				else
+				{
+					//Read out the dictonary from the DB
+					auto res = db.execute( "select word from Profanity_words" );
+				}
 			}
 			catch( FileException e )
+			{
+				stderr.writeln( e.msg );
+				throw e;
+			}
+
+			catch( SqliteException e )
 			{
 				stderr.writeln( e.msg );
 				throw e;
@@ -49,14 +72,27 @@ class Profanity_listener : IRC_Module
 		void
 		Add_words( string[] words, IRC_Client c, string sender )
 		{
+			string response = "PROF: Added ( ";
 			if( words.length == 0 ) Usage ( c, sender );
 			dictonary ~= words;
 
-			string response = "PROF: Added ( ";
+			//Update the database
+			auto update = db.prepare("insert into Profanity_words(word) values(?) ");
 			foreach( string word; words )
-				response ~= word ~" ";
-			response ~= ") to the naughty list";
+			{
+				try
+				{
+					update.inject(word);
+					response ~= word ~ " ";
+				}
+				catch( SqliteException e )
+				{
+					update.clearBindings();
+					c.Send_message( "Can't insert \"" ~ word ~ "\" into the DB. Probably already exists", sender );
+				}
+			}
 
+			response ~= " ) to the naughty list";
 			c.Send_message( response, sender );
 		}
 
